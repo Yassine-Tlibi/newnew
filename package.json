@@ -1,26 +1,51 @@
 {
-  "name": "nextjs",
-  "version": "0.1.0",
+  "name": "tn-game-price-finder",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push --accept-data-loss",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:setup": "tsx scripts/setup-database.ts",
+    "test:search": "tsx scripts/test-search-flow.ts",
+    "worker:crawl": "tsx workers/crawl-worker.ts",
+    "postinstall": "prisma generate"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "^7.2.0",
+    "@prisma/client": "^7.2.0",
+    "bullmq": "^5.66.5",
+    "cheerio": "^1.1.2",
+    "date-fns": "^4.1.0",
+    "dotenv": "^17.2.3",
+    "ioredis": "^5.9.1",
     "next": "16.0.7",
+    "pg": "^8.16.3",
+    "playwright": "^1.57.0",
+    "prisma": "^7.2.0",
     "react": "19.2.1",
-    "react-dom": "19.2.1"
+    "react-dom": "19.2.1",
+    "zod": "^4.3.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/cheerio": "^0.22.35",
     "@types/node": "^20",
+    "@types/pg": "^8.16.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.0.7",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

@@ -1,0 +1,126 @@
+// Prisma schema for TN Game Price Finder
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Categories for gaming products
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  parentId    String?
+  parent      Category? @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children    Category[] @relation("CategoryHierarchy")
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([slug])
+}
+
+// Tunisian stores
+model Store {
+  id              String         @id @default(cuid())
+  domain          String         @unique
+  name            String
+  logo            String?
+  active          Boolean        @default(true)
+  rateLimit       Int            @default(1000) // milliseconds between requests
+  lastCrawlAt     DateTime?
+  crawlEnabled    Boolean        @default(true)
+  sitemapUrl      String?
+  robotsTxt       String?
+  selectors       Json?          // Store-specific CSS selectors
+  categoryMappings Json?         // Category URL patterns
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  productOffers   ProductOffer[]
+  crawlLogs       CrawlLog[]
+
+  @@index([domain])
+  @@index([active, crawlEnabled])
+}
+
+// Canonical products (normalized/deduplicated)
+model Product {
+  id                String         @id @default(cuid())
+  normalizedTitle   String
+  originalTitle     String
+  category          Category       @relation(fields: [categoryId], references: [id])
+  categoryId        String
+  brand             String?
+  model             String?
+  imageUrl          String?
+  description       String?
+  specs             Json?
+  searchVector      String?        // For PostgreSQL full-text search
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  productOffers     ProductOffer[]
+
+  @@index([normalizedTitle])
+  @@index([categoryId])
+  @@index([brand])
+}
+
+// Individual offers from stores
+model ProductOffer {
+  id              String    @id @default(cuid())
+  product         Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId       String
+  store           Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  storeId         String
+  title           String
+  url             String
+  price           Decimal   @db.Decimal(10, 3) // TND with 3 decimals
+  currency        String    @default("TND")
+  originalPrice   Decimal?  @db.Decimal(10, 3)
+  inStock         Boolean   @default(true)
+  availability    String?   // "in_stock", "out_of_stock", "preorder", etc.
+  imageUrl        String?
+  lastCheckedAt   DateTime  @default(now())
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([productId, storeId])
+  @@index([price])
+  @@index([storeId])
+  @@index([inStock])
+  @@index([lastCheckedAt])
+}
+
+// Crawl activity log
+model CrawlLog {
+  id              String    @id @default(cuid())
+  store           Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  storeId         String
+  status          String    // "success", "failed", "partial"
+  productsFound   Int       @default(0)
+  productsUpdated Int       @default(0)
+  productsCreated Int       @default(0)
+  error           String?
+  startedAt       DateTime  @default(now())
+  completedAt     DateTime?
+  duration        Int?      // milliseconds
+
+  @@index([storeId, startedAt])
+  @@index([status])
+}
+
+// Search provider configuration (for external search APIs)
+model SearchProvider {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  type        String   // "serpapi", "brave", "google_cse", etc.
+  apiKey      String?
+  config      Json?
+  active      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
