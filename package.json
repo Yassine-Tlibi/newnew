@@ -8,8 +8,11 @@
     "start": "next start",
     "lint": "eslint",
     "db:generate": "prisma generate",
+    "db:push": "prisma db push --accept-data-loss",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
+    "db:setup": "tsx scripts/setup-database.ts",
+    "test:search": "tsx scripts/test-search-flow.ts",
     "worker:crawl": "tsx workers/crawl-worker.ts",
     "postinstall": "prisma generate"
   },
