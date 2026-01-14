@@ -18,7 +18,7 @@ function createPrismaClient() {
         adapter,
         log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
       });
-    } catch (error) {
+    } catch {
       console.warn('Failed to create Prisma client with adapter, falling back to default');
     }
   }

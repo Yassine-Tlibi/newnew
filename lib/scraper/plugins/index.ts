@@ -19,6 +19,7 @@ class GenericStorePlugin implements StorePlugin {
     return [`https://${this.domain}`];
   }
   
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   extractProducts(html: string, url: string): ScrapedProduct[] {
     // Generic extraction logic using common patterns
     // eslint-disable-next-line @typescript-eslint/no-require-imports

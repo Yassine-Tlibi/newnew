@@ -19,6 +19,7 @@ export class GameWorldPlugin extends BaseStorePlugin {
     ];
   }
   
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   extractProducts(html: string, url: string): ScrapedProduct[] {
     const $ = this.loadHtml(html);
     const products: ScrapedProduct[] = [];
