@@ -19,7 +19,7 @@ export class GameWorldPlugin extends BaseStorePlugin {
     ];
   }
   
-  extractProducts(html: string): ScrapedProduct[] {
+  extractProducts(html: string, url: string): ScrapedProduct[] {
     const $ = this.loadHtml(html);
     const products: ScrapedProduct[] = [];
     
@@ -38,7 +38,7 @@ export class GameWorldPlugin extends BaseStorePlugin {
         items.each((_, elem) => {
           try {
             const $elem = $(elem);
-            const product = this.extractProductFromElement($elem, $);
+            const product = this.extractProductFromElement($elem);
             if (product) products.push(product);
           } catch (error) {
             console.error('Error extracting product:', error);

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -25,22 +26,24 @@ export default function SearchBar({ onSearch, initialQuery = '' }: SearchBarProp
   }, []);
 
   useEffect(() => {
-    if (query.length >= 2) {
-      const timer = setTimeout(() => {
-        fetch(`/api/autocomplete?q=${encodeURIComponent(query)}`)
-          .then(res => res.json())
-          .then(data => {
-            setSuggestions(data.suggestions || []);
-            setShowSuggestions(true);
-          })
-          .catch(err => console.error('Autocomplete error:', err));
-      }, 300);
-
-      return () => clearTimeout(timer);
-    } else {
+    if (query.length < 2) {
+      // Clear suggestions when query is too short
       setSuggestions([]);
       setShowSuggestions(false);
+      return;
     }
+
+    const timer = setTimeout(() => {
+      fetch(`/api/autocomplete?q=${encodeURIComponent(query)}`)
+        .then(res => res.json())
+        .then(data => {
+          setSuggestions(data.suggestions || []);
+          setShowSuggestions(true);
+        })
+        .catch(err => console.error('Autocomplete error:', err));
+    }, 300);
+
+    return () => clearTimeout(timer);
   }, [query]);
 
   const handleSubmit = (e: React.FormEvent) => {

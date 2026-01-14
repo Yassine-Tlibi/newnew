@@ -5,9 +5,30 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { formatDistance } from 'date-fns';
 
+interface ProductData {
+  productId: string;
+  productTitle: string;
+  categoryName: string;
+  lowestPrice: number;
+  highestPrice: number;
+  offerCount: number;
+  offers: Array<{
+    offerId: string;
+    storeId: string;
+    storeName: string;
+    storeDomain: string;
+    url: string;
+    price: number;
+    currency: string;
+    inStock: boolean;
+    imageUrl?: string;
+    lastCheckedAt: Date;
+  }>;
+}
+
 export default function ProductPage() {
   const params = useParams();
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState<ProductData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -98,8 +119,8 @@ export default function ProductPage() {
                 
                 <div className="text-zinc-600 dark:text-zinc-400">
                   {product.offerCount} {product.offerCount === 1 ? 'offer' : 'offers'} from {
-                    new Set(product.offers.map((o: any) => o.storeId)).size
-                  } {new Set(product.offers.map((o: any) => o.storeId)).size === 1 ? 'store' : 'stores'}
+                    new Set(product.offers.map((o) => o.storeId)).size
+                  } {new Set(product.offers.map((o) => o.storeId)).size === 1 ? 'store' : 'stores'}
                 </div>
               </div>
             </div>
@@ -110,7 +131,7 @@ export default function ProductPage() {
               </h2>
               
               <div className="space-y-3">
-                {product.offers.map((offer: any) => (
+                {product.offers.map((offer) => (
                   <div
                     key={offer.offerId}
                     className="flex items-center justify-between p-4 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-700 transition-colors"

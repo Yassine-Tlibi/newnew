@@ -2,7 +2,7 @@
  * Store plugin registry
  */
 
-import { StorePlugin } from '../types';
+import { StorePlugin, ScrapedProduct } from '../types';
 import { GameWorldPlugin } from './gameworld';
 
 // Plugin registry
@@ -19,12 +19,12 @@ class GenericStorePlugin implements StorePlugin {
     return [`https://${this.domain}`];
   }
   
-  extractProducts(html: string): {title: string; url: string; price: number; currency: string; imageUrl?: string; availability: string}[] {
+  extractProducts(html: string, url: string): ScrapedProduct[] {
     // Generic extraction logic using common patterns
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const cheerio = require('cheerio');
     const $ = cheerio.load(html);
-    const products: {title: string; url: string; price: number; currency: string; imageUrl?: string; availability: string}[] = [];
+    const products: ScrapedProduct[] = [];
     
     // Try common product container selectors
     const containerSelectors = [
@@ -64,7 +64,7 @@ class GenericStorePlugin implements StorePlugin {
               price,
               currency: 'TND',
               imageUrl: imageUrl || undefined,
-              availability: 'in_stock',
+              availability: 'in_stock' as const,
             });
           }
         });

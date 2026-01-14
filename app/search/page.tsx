@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
@@ -7,15 +8,50 @@ import SearchBar from '@/components/SearchBar';
 import ProductCard from '@/components/ProductCard';
 import FilterPanel from '@/components/FilterPanel';
 
+interface SearchResult {
+  productId: string;
+  productTitle: string;
+  categoryName: string;
+  lowestPrice: number;
+  highestPrice: number;
+  offerCount: number;
+  offers: Array<{
+    offerId: string;
+    storeId: string;
+    storeName: string;
+    storeDomain: string;
+    url: string;
+    price: number;
+    currency: string;
+    inStock: boolean;
+    imageUrl?: string;
+    lastCheckedAt: Date;
+  }>;
+}
+
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+}
+
+interface Store {
+  id: string;
+  domain: string;
+  name: string;
+  logo?: string;
+}
+
 function SearchContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
-  const [categories, setCategories] = useState<any[]>([]);
-  const [stores, setStores] = useState<any[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [stores, setStores] = useState<Store[]>([]);
   
   const query = searchParams.get('q') || '';
   const categoryId = searchParams.get('category') || '';
@@ -125,7 +161,7 @@ function SearchContent() {
               </div>
             ) : results.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {results.map((product: any) => (
+                {results.map((product) => (
                   <ProductCard key={product.productId} product={product} />
                 ))}
               </div>

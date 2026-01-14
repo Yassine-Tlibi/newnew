@@ -6,24 +6,28 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-const connectionString = process.env.DATABASE_URL;
+function createPrismaClient() {
+  const connectionString = process.env.DATABASE_URL;
 
-let prismaInstance: PrismaClient;
-
-if (connectionString) {
-  const pool = new Pool({ connectionString });
-  const adapter = new PrismaPg(pool);
+  if (connectionString && process.env.NODE_ENV !== 'test') {
+    try {
+      const pool = new Pool({ connectionString });
+      const adapter = new PrismaPg(pool);
+      
+      return new PrismaClient({
+        adapter,
+        log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+      });
+    } catch (error) {
+      console.warn('Failed to create Prisma client with adapter, falling back to default');
+    }
+  }
   
-  prismaInstance = new PrismaClient({
-    adapter,
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-  });
-} else {
-  prismaInstance = new PrismaClient({
+  return new PrismaClient({
     log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
   });
 }
 
-export const prisma = globalForPrisma.prisma ?? prismaInstance;
+export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;

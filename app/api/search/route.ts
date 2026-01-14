@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { searchProducts } from '@/lib/search';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
@@ -11,7 +13,7 @@ export async function GET(request: NextRequest) {
     const minPrice = searchParams.get('minPrice') ? parseFloat(searchParams.get('minPrice')!) : undefined;
     const maxPrice = searchParams.get('maxPrice') ? parseFloat(searchParams.get('maxPrice')!) : undefined;
     const inStockOnly = searchParams.get('inStockOnly') === 'true';
-    const sortBy = (searchParams.get('sortBy') as any) || 'price_asc';
+    const sortBy = (searchParams.get('sortBy') as 'price_asc' | 'price_desc' | 'newest' | 'relevance') || 'price_asc';
     const exactMatch = searchParams.get('exactMatch') === 'true';
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 20;
     const page = searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1;

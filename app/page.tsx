@@ -5,9 +5,16 @@ import { useRouter } from 'next/navigation';
 import SearchBar from '@/components/SearchBar';
 import CategoryButtons from '@/components/CategoryButtons';
 
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+}
+
 export default function Home() {
   const router = useRouter();
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     fetch('/api/categories')
